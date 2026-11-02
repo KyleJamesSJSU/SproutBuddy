@@ -11,7 +11,7 @@ public class DBConnection {
     private static final String USER = "root";
 
     private static final String PASSWORD =
-        "THIS_WILL_BE_YOUR_MYSQL_CONNECTION_PASSWORD";   //Note: Important
+        "sproutbuddy";   //Note: Important
 
     public static Connection getConnection() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
