@@ -161,3 +161,62 @@ body {
  
 .switch-link a:hover { text-decoration: underline; }
  
+/* =====================================================
+   Log-in page additions
+   ===================================================== */
+ 
+.screen h1.brand { margin-bottom: 6px; }
+ 
+.tagline {
+    margin: 0 0 40px;
+    font-size: 1rem;
+    color: var(--ink);
+    text-align: center;
+}
+ 
+/* Label row with the "Show" password checkbox on the right */
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+ 
+.label-row label { margin-bottom: 0; }
+ 
+.show-password {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--muted);
+    cursor: pointer;
+}
+ 
+.show-password input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--teal);
+}
+ 
+/* "New user?" block at the bottom of the log-in screen */
+.new-user {
+    width: 100%;
+    margin-top: auto;
+    padding-top: 40px;
+    text-align: center;
+    font-size: 0.95rem;
+}
+ 
+.new-user p { margin: 0 0 12px; }
+ 
+.btn-block {
+    display: block;
+    width: 100%;
+    line-height: 48px;
+    padding: 0;
+    text-decoration: none;
+    text-align: center;
+}
+ 
