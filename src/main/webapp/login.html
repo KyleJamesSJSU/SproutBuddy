@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#DDF7F0">
+    <title>Log In | SproutBuddy</title>
+ 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="css/auth.css">
+</head>
+ 
+<body>
+ 
+<main class="screen">
+ 
+    <!-- Pixel-art sprout logo (inline SVG, no image file needed) -->
+    <svg class="logo" viewBox="0 0 24 18" shape-rendering="crispEdges"
+         xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SproutBuddy sprout">
+        <g fill="#B8E62A">
+            <rect x="4"  y="0" width="6" height="1"/>
+            <rect x="14" y="0" width="6" height="1"/>
+        </g>
+        <g fill="#8FD43A">
+            <rect x="2"  y="1" width="9" height="1"/>
+            <rect x="13" y="1" width="9" height="1"/>
+        </g>
+        <g fill="#5FB83A">
+            <rect x="3"  y="2" width="8" height="1"/>
+            <rect x="13" y="2" width="8" height="1"/>
+        </g>
+        <rect x="11" y="2" width="2" height="12" fill="#3E9E3A"/>
+        <g fill="#4DAF45">
+            <rect x="5"  y="9"  width="1" height="3"/>
+            <rect x="7"  y="8"  width="1" height="4"/>
+            <rect x="9"  y="10" width="1" height="2"/>
+            <rect x="15" y="10" width="1" height="2"/>
+            <rect x="17" y="8"  width="1" height="4"/>
+            <rect x="19" y="9"  width="1" height="3"/>
+        </g>
+        <g fill="#B8E62A">
+            <rect x="7"  y="13" width="10" height="1"/>
+            <rect x="5"  y="14" width="14" height="1"/>
+            <rect x="4"  y="15" width="16" height="1"/>
+            <rect x="5"  y="16" width="14" height="1"/>
+            <rect x="7"  y="17" width="10" height="1"/>
+        </g>
+    </svg>
+ 
+    <h1 class="brand">SproutBuddy</h1>
+    <p class="tagline">your personal plant care reminder.</p>
+ 
+    <!-- Filled in by the script below if the URL has ?error=... -->
+    <p class="error-message" id="error" role="alert" hidden></p>
+ 
+    <form class="auth-form" action="login" method="post">
+ 
+        <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email"
+                   autocomplete="email" maxlength="100" required>
+        </div>
+ 
+        <div class="field">
+            <div class="label-row">
+                <label for="password">Password</label>
+                <label class="show-password">
+                    <input type="checkbox" id="show-password"> Show
+                </label>
+            </div>
+            <input type="password" id="password" name="password"
+                   autocomplete="current-password" required>
+        </div>
+ 
+        <div class="form-actions">
+            <button type="submit" class="btn">Login</button>
+        </div>
+ 
+    </form>
+ 
+    <div class="new-user">
+        <p>New user?</p>
+        <a href="register.html" class="btn btn-block">Create an account</a>
+    </div>
+ 
+</main>
+ 
+<script>
+    // Show/hide password
+    const password = document.getElementById("password");
+    document.getElementById("show-password").addEventListener("change", (e) => {
+        password.type = e.target.checked ? "text" : "password";
+    });
+ 
+    // Show an error if the server redirects back with e.g. login.html?error=Wrong+email+or+password
+    const error = new URLSearchParams(window.location.search).get("error");
+    if (error) {
+        const box = document.getElementById("error");
+        box.textContent = error;   // textContent (not innerHTML) so it can't inject HTML
+        box.hidden = false;
+    }
+</script>
+ 
+</body>
+</html>
+ 

@@ -19,11 +19,11 @@
 
     <h2>Navigation</h2>
 
-    <a href="login.jsp">
+    <a href="login.html">
         <button>Login</button>
     </a>
 
-    <a href="register.jsp">
+    <a href="register.html">
         <button>Register</button>
     </a>
 
