@@ -1,17 +1,18 @@
 package sproutbuddy.util;
 
 import java.sql.Connection;
+
 import java.sql.DriverManager;
 
-public class DBConnection {
 
+
+public class DBConnection {
+		
     private static final String URL =
-        "jdbc:mysql://localhost:3306/sproutbuddy";
+        "jdbc:mysql://localhost:3307/sproutbuddy";
 
     private static final String USER = "root";
-
-    private static final String PASSWORD =
-        "THIS_WILL_BE_YOUR_MYSQL_CONNECTION_PASSWORD";   //Note: Important
+    private static final String PASSWORD = "NewPassword123!";
 
     public static Connection getConnection() throws Exception {
         Class.forName("com.mysql.cj.jdbc.Driver");
