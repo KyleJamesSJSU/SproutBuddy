@@ -91,6 +91,79 @@ CREATE TABLE user_plants (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+-- =====================================================
+-- CARE TEMPLATES
+-- Stores the default care schedule for each species.
+-- One row per species per task type, written once and
+-- shared by every user who owns that species.
+--
+-- Example: Pothos -> water every 7 days
+--
+-- Works for built-in and user-created species alike.
+-- =====================================================
+ 
+CREATE TABLE care_templates (
+    template_id INT AUTO_INCREMENT PRIMARY KEY,
+    species_id INT NOT NULL,
+    task_type ENUM('water', 'fertilize', 'prune', 'repot', 'mist') NOT NULL,
+    interval_days INT NOT NULL,
+ 
+    UNIQUE (species_id, task_type),
+ 
+    FOREIGN KEY (species_id)
+        REFERENCES plant_species(species_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+ 
+ 
+-- =====================================================
+-- CARE TASKS
+-- Stores the actual reminders for each user plant.
+--
+-- Open task:
+--      completed_at = NULL
+--
+-- Completed task:
+--      completed_at = time the user marked it done
+--
+-- Completed rows are kept so they can be used for
+-- history, streaks, and game elements.
+-- =====================================================
+ 
+CREATE TABLE care_tasks (
+    task_id INT AUTO_INCREMENT PRIMARY KEY,
+    plant_id INT NOT NULL,
+    task_type ENUM('water', 'fertilize', 'prune', 'repot', 'mist') NOT NULL,
+    due_date DATE NOT NULL,
+    completed_at TIMESTAMP NULL DEFAULT NULL,
+ 
+    INDEX idx_tasks_due (due_date, completed_at),
+ 
+    FOREIGN KEY (plant_id)
+        REFERENCES user_plants(plant_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
+ 
+ 
+-- =====================================================
+-- TRIGGER: CREATE FIRST CARE TASKS
+-- When a user adds a plant, automatically create the
+-- first reminder for each task in that species'
+-- care template.
+--
+-- Next tasks (after a task is completed) are created
+-- by the backend using completed_at + interval_days.
+-- =====================================================
+ 
+CREATE TRIGGER trg_user_plants_create_tasks
+AFTER INSERT ON user_plants
+FOR EACH ROW
+    INSERT INTO care_tasks (plant_id, task_type, due_date)
+    SELECT NEW.plant_id,
+           ct.task_type,
+           DATE_ADD(NEW.date_added, INTERVAL ct.interval_days DAY)
+    FROM care_templates ct
+    WHERE ct.species_id = NEW.species_id;
 
 -- =====================================================
 -- DEVELOPMENT / SAMPLE PLANT DATA
