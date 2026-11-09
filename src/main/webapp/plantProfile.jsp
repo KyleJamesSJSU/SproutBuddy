@@ -1,0 +1,129 @@
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+
+<%!
+    private String escapeHtml(String value) {
+        if (value == null) return "";
+        return value.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#39;");
+    }
+%>
+
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#FFFFFF">
+    <title>Plant | SproutBuddy</title>
+ 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+ 
+<body>
+ 
+<main class="app-screen white">
+ 
+    <header class="topbar between">
+        <a class="icon-btn" id="btn-back" href="garden.html" aria-label="Back to your garden"></a>
+        <div class="topbar-right">
+            <button class="icon-btn" id="btn-settings" type="button" aria-label="Settings"></button>
+            <button class="avatar-btn" id="btn-account" type="button" aria-label="Account"></button>
+        </div>
+    </header>
+ 
+    <div class="page-scroll">
+ 
+        <!-- Name + photo -->
+        <div class="plant-head">
+            <h1 class="plant-title">
+    			<span id="plant-name">
+    				<%= escapeHtml(
+    					((sproutbuddy.model.UserPlant)
+        					request.getAttribute("plant")).getNickname()
+					) %>
+    			</span>
+    		<button class="edit-btn" id="edit-name"
+            		type="button" aria-label="Rename plant"></button>
+			</h1>
+			<p class="plant-scientific-name">
+    				<%= escapeHtml(
+        				((sproutbuddy.model.UserPlant)
+            				request.getAttribute("plant"))
+            				.getSpecies().getScientificName()
+    				) %>
+			</p>
+ 
+            <div class="photo-wrap">
+                <div id="photo-slot"></div>
+                <label class="photo-edit" title="Change photo">
+                    <span id="camera-icon"></span>
+                    <input type="file" id="photo-input" accept="image/*" aria-label="Change plant photo">
+                </label>
+            </div>
+        </div>
+ 
+        <!-- Streak calendar -->
+        <section class="section">
+            <div class="section-head">
+                <span class="pill">Streak</span>
+                <span class="streak-count" id="streak-count"></span>
+            </div>
+ 
+            <div class="cal-nav">
+                <button type="button" id="cal-prev" aria-label="Previous month"></button>
+                <strong id="cal-title"></strong>
+                <button type="button" id="cal-next" aria-label="Next month"></button>
+            </div>
+ 
+            <div class="calendar" id="calendar"></div>
+ 
+            <div class="legend" id="legend"></div>
+        </section>
+ 
+        <!-- Plant details (editable) -->
+        <section class="section">
+            <span class="pill">Plant Details</span>
+ 
+            <div class="detail">
+                <p class="detail-label">Sunshine</p>
+                <button class="detail-pill sun" id="edit-sun" type="button"></button>
+            </div>
+ 
+            <div class="detail">
+                <p class="detail-label">Water</p>
+                <button class="detail-pill water" id="edit-water" type="button"></button>
+            </div>
+        </section>
+        
+        <section class="section">
+    		<span class="pill">Care Instructions</span>
+
+   			 <div class="detail">
+        		<p>
+		            <%= escapeHtml(
+		                ((sproutbuddy.model.UserPlant)
+		                    request.getAttribute("plant"))
+		                    .getSpecies().getCareInstructions()
+		            ) %>
+        		</p>
+    		</div>
+		</section>
+ 
+    </div>
+ 
+</main>
+ 
+<script src="js/common.js"></script>
+
+</body>
+</html>
+ 
