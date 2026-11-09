@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+ 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#DDF7F0">
+    <title>Your Garden | SproutBuddy</title>
+ 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+ 
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+ 
+<body>
+ 
+<main class="app-screen">
+ 
+    <!-- Settings (gear) + account (avatar) – wired up by common.js -->
+    <header class="topbar">
+        <button class="icon-btn" id="btn-settings" type="button" aria-label="Settings"></button>
+        <button class="avatar-btn" id="btn-account" type="button" aria-label="Account"></button>
+    </header>
+ 
+    <h1 class="page-title" id="page-title">Your Garden</h1>
+ 
+    <section class="card">
+ 
+        <!-- GARDEN: swipe through plants -->
+        <div class="panel" id="panel-garden" role="tabpanel" aria-labelledby="tab-garden">
+            <div class="carousel-wrap">
+                <button class="arrow" id="prev" type="button" aria-label="Previous plant"></button>
+                <div class="carousel" id="carousel"></div>
+                <button class="arrow" id="next" type="button" aria-label="Next plant"></button>
+            </div>
+            <div class="dots" id="dots"></div>
+        </div>
+ 
+        <!-- REMINDERS: today's tasks across all plants -->
+        <div class="panel" id="panel-reminders" role="tabpanel" aria-labelledby="tab-reminders" hidden></div>
+ 
+        <!-- FRIENDS: friends' plant care streaks -->
+        <div class="panel" id="panel-friends" role="tabpanel" aria-labelledby="tab-friends" hidden></div>
+ 
+        <nav class="tabs" role="tablist" aria-label="Sections">
+            <button type="button" role="tab" id="tab-garden"    data-tab="garden"    aria-selected="true">garden</button>
+            <button type="button" role="tab" id="tab-reminders" data-tab="reminders" aria-selected="false">reminders</button>
+            <button type="button" role="tab" id="tab-friends"   data-tab="friends"   aria-selected="false">friends</button>
+        </nav>
+ 
+    </section>
+ 
+</main>
+ 
+<script src="js/store.js"></script>
+<script src="js/common.js"></script>
+<script src="js/garden.js"></script>
+ 
+</body>
+</html>
+ 
