@@ -12,6 +12,7 @@ public class DBConnection {
         "jdbc:mysql://localhost:3307/sproutbuddy";
 
     private static final String USER = "root";
+    
     private static final String PASSWORD = "NewPassword123!";
 
     public static Connection getConnection() throws Exception {
