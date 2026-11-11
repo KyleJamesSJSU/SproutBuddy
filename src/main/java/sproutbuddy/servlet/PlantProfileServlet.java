@@ -26,28 +26,28 @@ public class PlantProfileServlet extends HttpServlet {
         userPlantDAO = new UserPlantDAO();
     }
 
+    // =====================================
+    // GET: Display an individual plant
+    // =====================================
     @Override
     protected void doGet(
             HttpServletRequest request,
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Retrieve the existing session without creating a new one.
         HttpSession session = request.getSession(false);
 
-        // Require the user to be logged in.
         if (session == null ||
                 !(session.getAttribute("user") instanceof User)) {
 
             response.sendRedirect(
-                    request.getContextPath() + "/login.html");
+                    request.getContextPath() + "/login");
             return;
         }
 
         User user = (User) session.getAttribute("user");
         int userId = user.getId();
 
-        // Read and validate the plant ID from the URL.
         int plantId;
 
         try {
@@ -68,7 +68,6 @@ public class PlantProfileServlet extends HttpServlet {
             return;
         }
 
-        // Retrieve only a plant owned by this user.
         try {
             UserPlant plant =
                     userPlantDAO.getPlantById(plantId, userId);
@@ -91,6 +90,140 @@ public class PlantProfileServlet extends HttpServlet {
             response.sendError(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
                     "Unable to load plant profile.");
+        }
+    }
+
+    // =====================================
+    // POST: Update plant information
+    // =====================================
+    @Override
+    protected void doPost(
+            HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        request.setCharacterEncoding("UTF-8");
+
+        HttpSession session = request.getSession(false);
+
+        if (session == null ||
+                !(session.getAttribute("user") instanceof User)) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login");
+            return;
+        }
+
+        User user = (User) session.getAttribute("user");
+        int userId = user.getId();
+
+        int plantId;
+
+        try {
+            plantId = Integer.parseInt(
+                    request.getParameter("id"));
+
+            if (plantId <= 0) {
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Invalid plant ID.");
+                return;
+            }
+
+        } catch (NumberFormatException e) {
+            response.sendError(
+                    HttpServletResponse.SC_BAD_REQUEST,
+                    "A valid plant ID is required.");
+            return;
+        }
+
+        // Determine which field the user is updating
+        String action = request.getParameter("action");
+
+        try {
+            boolean updated;
+
+            // =====================================
+            // UPDATE NICKNAME
+            // =====================================
+            if ("rename".equals(action)) {
+
+                String nickname =
+                        request.getParameter("nickname");
+
+                if (nickname == null ||
+                        nickname.trim().isEmpty() ||
+                        nickname.trim().length() > 100) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Invalid plant nickname.");
+                    return;
+                }
+
+                updated = userPlantDAO.updatePlantNickname(
+                        plantId,
+                        userId,
+                        nickname.trim());
+
+            // =====================================
+            // UPDATE LOCATION AND NOTES
+            // =====================================
+            } else if ("updateDetails".equals(action)) {
+
+                String location =
+                        request.getParameter("location");
+
+                String notes =
+                        request.getParameter("notes");
+
+                location = location == null
+                        ? "" : location.trim();
+
+                notes = notes == null
+                        ? "" : notes.trim();
+
+                if (location.length() > 100 ||
+                        notes.length() > 5000) {
+
+                    response.sendError(
+                            HttpServletResponse.SC_BAD_REQUEST,
+                            "Plant details exceed allowed length.");
+                    return;
+                }
+
+                updated = userPlantDAO.updatePlantDetails(
+                        plantId,
+                        userId,
+                        location,
+                        notes);
+
+            } else {
+
+                response.sendError(
+                        HttpServletResponse.SC_BAD_REQUEST,
+                        "Unknown update action.");
+                return;
+            }
+
+            if (!updated) {
+                response.sendError(
+                        HttpServletResponse.SC_NOT_FOUND,
+                        "Plant not found or access denied.");
+                return;
+            }
+
+            // Redirect back to the updated plant profile
+            response.sendRedirect(
+                    request.getContextPath()
+                    + "/plant-profile?id=" + plantId);
+
+        } catch (Exception e) {
+            log("Error updating plant profile", e);
+
+            response.sendError(
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Unable to update plant profile.");
         }
     }
 }

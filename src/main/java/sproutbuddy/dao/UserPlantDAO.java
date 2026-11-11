@@ -144,4 +144,60 @@ public class UserPlantDAO {
             rs.getString("notes")
         );
     }
+    
+
+	/**
+	 * Updates the nickname of a plant belonging to a user.
+	 *
+	 * @param plantId ID of the plant being updated
+	 * @param userId ID of the authenticated user
+	 * @param nickname New plant nickname
+	 * @return true if the plant was updated successfully
+	 */
+	public boolean updatePlantNickname(
+	        int plantId, int userId, String nickname)
+	        throws Exception {
+	
+	    String sql = "UPDATE user_plants "
+	               + "SET nickname = ? "
+	               + "WHERE plant_id = ? AND user_id = ?";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setString(1, nickname);
+	        stmt.setInt(2, plantId);
+	        stmt.setInt(3, userId);
+	
+	        return stmt.executeUpdate() == 1;
+	    }
+	}
+	
+
+	/**
+	 * Updates the location and personal notes of a user's plant.
+	 */
+	public boolean updatePlantDetails(
+	        int plantId,
+	        int userId,
+	        String location,
+	        String notes) throws Exception {
+	
+	    String sql = "UPDATE user_plants "
+	               + "SET location = ?, notes = ? "
+	               + "WHERE plant_id = ? AND user_id = ?";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setString(1, location);
+	        stmt.setString(2, notes);
+	        stmt.setInt(3, plantId);
+	        stmt.setInt(4, userId);
+	
+	        return stmt.executeUpdate() == 1;
+	    }
+	}
+
+
 }
