@@ -8,33 +8,33 @@
 -- Use this script to set up/reset the development
 -- database for the SproutBuddy project.
 -- =====================================================
-
-
+ 
+ 
 -- Delete existing development database
 DROP DATABASE IF EXISTS sproutbuddy;
-
-
+ 
+ 
 -- Create SproutBuddy database
 CREATE DATABASE sproutbuddy;
-
-
+ 
+ 
 -- Select database
 USE sproutbuddy;
-
-
+ 
+ 
 -- =====================================================
 -- USERS
 -- Stores SproutBuddy user accounts.
 -- =====================================================
-
+ 
 CREATE TABLE users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
-
-
+ 
+ 
 -- =====================================================
 -- PLANT SPECIES
 -- Stores general plant information used by the
@@ -48,7 +48,7 @@ CREATE TABLE users (
 --      is_custom = TRUE
 --      created_by_user_id = user's ID
 -- =====================================================
-
+ 
 CREATE TABLE plant_species (
     species_id INT AUTO_INCREMENT PRIMARY KEY,
     common_name VARCHAR(100) NOT NULL,
@@ -58,13 +58,13 @@ CREATE TABLE plant_species (
     care_instructions TEXT,
     is_custom BOOLEAN NOT NULL DEFAULT FALSE,
     created_by_user_id INT NULL,
-
+ 
     FOREIGN KEY (created_by_user_id)
         REFERENCES users(user_id)
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
-
-
+ 
+ 
 -- =====================================================
 -- USER PLANTS
 -- Stores individual plants owned by SproutBuddy users.
@@ -72,7 +72,7 @@ CREATE TABLE plant_species (
 -- Each plant belongs to one user and references one
 -- species from the plant_species table.
 -- =====================================================
-
+ 
 CREATE TABLE user_plants (
     plant_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
@@ -81,16 +81,19 @@ CREATE TABLE user_plants (
     date_added DATE NOT NULL DEFAULT (CURRENT_DATE),
     location VARCHAR(100),
     photo VARCHAR(255),
-
+ 
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)
         ON DELETE CASCADE,
-
+ 
     FOREIGN KEY (species_id)
         REFERENCES plant_species(species_id)
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
+
+ 
+ 
 -- =====================================================
 -- CARE TEMPLATES
 -- Stores the default care schedule for each species.
@@ -164,12 +167,13 @@ FOR EACH ROW
            DATE_ADD(NEW.date_added, INTERVAL ct.interval_days DAY)
     FROM care_templates ct
     WHERE ct.species_id = NEW.species_id;
-
+ 
+ 
 -- =====================================================
 -- DEVELOPMENT / SAMPLE PLANT DATA
 -- Used to test the Plant Catalog during development.
 -- =====================================================
-
+ 
 INSERT INTO plant_species (
     common_name,
     scientific_name,
@@ -199,14 +203,80 @@ VALUES
     'Moderate',
     'Keep in well-draining soil.'
 );
-
-
+ 
+ 
+-- =====================================================
+-- DEVELOPMENT / SAMPLE CARE TEMPLATE DATA
+-- Default care schedules for the sample species.
+-- =====================================================
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'water', 7
+FROM plant_species WHERE common_name = 'Pothos';
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'fertilize', 30
+FROM plant_species WHERE common_name = 'Pothos';
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'water', 14
+FROM plant_species WHERE common_name = 'Snake Plant';
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'fertilize', 60
+FROM plant_species WHERE common_name = 'Snake Plant';
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'water', 7
+FROM plant_species WHERE common_name = 'Monstera';
+ 
+INSERT INTO care_templates (species_id, task_type, interval_days)
+SELECT species_id, 'fertilize', 30
+FROM plant_species WHERE common_name = 'Monstera';
+ 
+ 
+-- =====================================================
+-- DEVELOPMENT / SAMPLE USER AND PLANTS
+-- Used to test reminders. The trigger above creates
+-- the first care_tasks automatically.
+-- Dated in the past so some tasks are already due.
+-- =====================================================
+ 
+INSERT INTO users (username, email, password_hash)
+VALUES ('testuser', 'testuser@example.com', 'ypC+laRiAYUqoR2BSbab5w==:gZztPNPyhEVb1Xdyofnu/OEySloLp1N2JCovjYtAGMs='); 
+-- username testuser and password password123.
+ 
+INSERT INTO user_plants (user_id, species_id, nickname, date_added, location)
+VALUES
+(1, 1, 'Penny the Pothos', DATE_SUB(CURRENT_DATE, INTERVAL 10 DAY), 'Bedroom window'),
+(1, 2, 'Sir Snake',        DATE_SUB(CURRENT_DATE, INTERVAL 3 DAY),  'Living room');
+ 
+ 
 -- =====================================================
 -- SETUP VERIFICATION
 -- =====================================================
-
+ 
 -- Display all tables created by this script.
 SHOW TABLES;
-
+ 
 -- Display sample plant catalog data.
 SELECT * FROM plant_species;
+ 
+-- Display default care schedules.
+SELECT * FROM care_templates;
+ 
+-- Display reminders that are due (what the app shows
+-- for a user, with the care info for that plant).
+SELECT
+    p.nickname,
+    s.common_name,
+    t.task_type,
+    t.due_date,
+    s.care_instructions
+FROM care_tasks t
+JOIN user_plants p ON p.plant_id = t.plant_id
+JOIN plant_species s ON s.species_id = p.species_id
+WHERE p.user_id = 1
+  AND t.completed_at IS NULL
+  AND t.due_date <= CURRENT_DATE
+ORDER BY t.due_date;
