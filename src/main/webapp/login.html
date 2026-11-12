@@ -60,9 +60,10 @@
     <form class="auth-form" action="login" method="post">
  
         <div class="field">
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email"
-                   autocomplete="email" maxlength="100" required>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username"
+                   autocomplete="username" autocapitalize="none" spellcheck="false"
+                   maxlength="50" required>
         </div>
  
         <div class="field">
@@ -96,7 +97,7 @@
         password.type = e.target.checked ? "text" : "password";
     });
  
-    // Show an error if the server redirects back with e.g. login.html?error=Wrong+email+or+password
+    // Show an error if the server redirects back with e.g. login.html?error=Wrong+username+or+password
     const error = new URLSearchParams(window.location.search).get("error");
     if (error) {
         const box = document.getElementById("error");
