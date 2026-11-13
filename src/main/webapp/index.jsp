@@ -19,7 +19,7 @@
 
     <h2>Navigation</h2>
 
-    <a href="login.html">
+    <a href="login.html?v=2">
         <button>Login</button>
     </a>
 
@@ -29,6 +29,10 @@
 
     <a href="plant-catalog">
         <button>Browse Plant Catalog</button>
+    </a>
+
+    <a href="reminders">
+        <button>View Plant Schedule</button>
     </a>
 
 </body>

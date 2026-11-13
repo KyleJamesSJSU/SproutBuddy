@@ -147,8 +147,23 @@
         return row;
     }
  
+    function upcomingRow(r) {
+        const date = SB.parse(r.date).toLocaleDateString(undefined, {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric'
+        });
+        return el('li', { class: 'upcoming-reminder' },
+            el('div', { class: 'upcoming-date', text: date }),
+            el('span', { class: 'task-icon', html: ICONS[r.task === 'sun' ? 'sun' : 'drop'] }),
+            el('span', { class: 'reminder-text' },
+                el('strong', { text: TASK_NAME[r.task] }),
+                el('span', { text: r.plantName })));
+    }
+
     function renderReminders() {
         const items = SB.remindersToday();
+        const upcoming = SB.remindersUpcoming(7);
         const doneCount = items.filter(function (r) { return r.done; }).length;
         const pending = items.filter(function (r) { return !r.done; });
         const done = items.filter(function (r) { return r.done; });
@@ -165,19 +180,23 @@
  
         if (!items.length) {
             remindersPanel.append(el('p', { class: 'empty', text: 'Nothing due today. Enjoy the day!' }));
-            return;
-        }
- 
-        if (pending.length) {
-            remindersPanel.append(el('ul', { class: 'reminder-list' }, pending.map(reminderRow)));
-            remindersPanel.append(el('p', { class: 'swipe-tip', text: 'Swipe right or tap the circle to check off' }));
         } else {
-            remindersPanel.append(el('p', { class: 'empty', text: 'All caught up for today!' }));
+            if (pending.length) {
+                remindersPanel.append(el('ul', { class: 'reminder-list' }, pending.map(reminderRow)));
+                remindersPanel.append(el('p', { class: 'swipe-tip', text: 'Swipe right or tap the circle to check off' }));
+            } else {
+                remindersPanel.append(el('p', { class: 'empty', text: 'All caught up for today!' }));
+            }
+
+            if (done.length) {
+                remindersPanel.append(el('p', { class: 'list-label', text: 'Completed' }));
+                remindersPanel.append(el('ul', { class: 'reminder-list' }, done.map(reminderRow)));
+            }
         }
- 
-        if (done.length) {
-            remindersPanel.append(el('p', { class: 'list-label', text: 'Completed' }));
-            remindersPanel.append(el('ul', { class: 'reminder-list' }, done.map(reminderRow)));
+
+        if (upcoming.length) {
+            remindersPanel.append(el('p', { class: 'list-label', text: 'Upcoming' }));
+            remindersPanel.append(el('ul', { class: 'reminder-list' }, upcoming.map(upcomingRow)));
         }
     }
  

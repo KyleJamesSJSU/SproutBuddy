@@ -202,6 +202,31 @@
         return out.sort((a, b) => a.done - b.done);
     }
  
+    // Scheduled tasks after today, grouped by date for the reminders view.
+    function remindersUpcoming(days) {
+        const out = [];
+        const count = Math.max(1, Number(days) || 7);
+        SB.state.plants.forEach(p => {
+            TASKS.forEach(task => {
+                for (let offset = 1; offset <= count; offset++) {
+                    const ds = addDays(today(), offset);
+                    if (dueBySchedule(p, task, ds)) {
+                        out.push({
+                            plantId: p.id,
+                            plantName: p.nickname,
+                            photo: p.photo,
+                            task: task,
+                            date: ds
+                        });
+                        break;
+                    }
+                }
+            });
+        });
+        return out.sort((a, b) => a.date.localeCompare(b.date) ||
+            a.plantName.localeCompare(b.plantName));
+    }
+
     /* ---------- export ---------- */
  
     const SB = {
@@ -209,7 +234,7 @@
         save, reset,
         today, fmt, parse, addDays, daysBetween,
         getPlant, updatePlant, updateFrequency, freqLabel,
-        dayInfo, setDone, streak, remindersToday,
+        dayInfo, setDone, streak, remindersToday, remindersUpcoming,
         TASKS
     };
  

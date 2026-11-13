@@ -30,7 +30,8 @@ public class LoginServlet extends HttpServlet {
             HttpServletResponse response)
             throws ServletException, IOException {
 
-        request.getRequestDispatcher("/login.jsp").forward(request, response);
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        response.sendRedirect(request.getContextPath() + "/login.html?v=2");
     }
 
     @Override
@@ -70,6 +71,6 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("user", user);
         session.setMaxInactiveInterval(30 * 60);
 
-        response.sendRedirect(request.getContextPath() + "/index.jsp");
+        response.sendRedirect(request.getContextPath() + "/garden.html");
     }
 }
