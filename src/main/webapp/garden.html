@@ -25,12 +25,12 @@
         <button class="avatar-btn" id="btn-account" type="button" aria-label="Account"></button>
     </header>
  
-    <h1 class="page-title" id="page-title">Your Garden</h1>
+    <h1 class="page-title" id="page-title">Reminders</h1>
  
     <section class="card">
  
         <!-- GARDEN: swipe through plants -->
-        <div class="panel" id="panel-garden" role="tabpanel" aria-labelledby="tab-garden">
+        <div class="panel" id="panel-garden" role="tabpanel" aria-labelledby="tab-garden" hidden>
             <div class="carousel-wrap">
                 <button class="arrow" id="prev" type="button" aria-label="Previous plant"></button>
                 <div class="carousel" id="carousel"></div>
@@ -40,14 +40,14 @@
         </div>
  
         <!-- REMINDERS: today's tasks across all plants -->
-        <div class="panel" id="panel-reminders" role="tabpanel" aria-labelledby="tab-reminders" hidden></div>
+        <div class="panel" id="panel-reminders" role="tabpanel" aria-labelledby="tab-reminders"></div>
  
         <!-- FRIENDS: friends' plant care streaks -->
         <div class="panel" id="panel-friends" role="tabpanel" aria-labelledby="tab-friends" hidden></div>
  
         <nav class="tabs" role="tablist" aria-label="Sections">
-            <button type="button" role="tab" id="tab-garden"    data-tab="garden"    aria-selected="true">garden</button>
-            <button type="button" role="tab" id="tab-reminders" data-tab="reminders" aria-selected="false">reminders</button>
+            <button type="button" role="tab" id="tab-garden"    data-tab="garden"    aria-selected="false">garden</button>
+            <button type="button" role="tab" id="tab-reminders" data-tab="reminders" aria-selected="true">reminders</button>
             <button type="button" role="tab" id="tab-friends"   data-tab="friends"   aria-selected="false">friends</button>
         </nav>
  

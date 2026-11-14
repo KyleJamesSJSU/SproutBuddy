@@ -64,6 +64,7 @@
     }
  
     function syncCarousel() {
+        if (!carousel.clientWidth) return;   // garden tab is hidden, nothing to measure
         const i = currentIndex();
         const last = state.plants.length - 1;
         prev.disabled = i <= 0;
@@ -230,14 +231,15 @@
     const panels = { garden: $('#panel-garden'), reminders: remindersPanel, friends: friendsPanel };
  
     function showTab(name) {
-        if (!panels[name]) name = 'garden';
+        if (!panels[name]) name = 'reminders';   // dashboard opens on reminders
         tabs.forEach(function (t) { t.setAttribute('aria-selected', String(t.dataset.tab === name)); });
         Object.keys(panels).forEach(function (k) { panels[k].hidden = k !== name; });
         $('#page-title').textContent = TITLES[name];
         document.title = TITLES[name] + ' | SproutBuddy';
-        history.replaceState(null, '', name === 'garden' ? location.pathname : '#' + name);
+        history.replaceState(null, '', '#' + name);
         if (name === 'garden') {
-            const saved = currentIndex();
+            let saved = 0;
+            try { saved = Number(sessionStorage.getItem('sb-slide')) || 0; } catch (e) { /* ignore */ }
             carousel.scrollLeft = saved * carousel.clientWidth;
             syncCarousel();
         }

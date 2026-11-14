@@ -11,7 +11,7 @@
  
     const id = Number(new URLSearchParams(location.search).get('id'));
     const plant = SB.getPlant(id);
-    if (!plant) { location.replace('garden.html'); return; }
+    if (!plant) { location.replace('garden.html#garden'); return; }
  
     SB_UI.initTopbar();
     $('#btn-back').innerHTML = ICONS.back;
