@@ -10,6 +10,9 @@
     --water-bg: #CDEFFF;
     --water-ink:#1A8FD0;
     --line:     #CFE3DC;
+    --tint:     #E9FAF4;   /* seasons.css overrides these per season */
+    --soft:     #F3F7F5;
+    --ring:     rgba(0, 185, 139, 0.45);
 }
  
 [hidden] { display: none !important; }
@@ -93,7 +96,7 @@ button { font-family: inherit; }
 .arrow:focus-visible,
 .detail-pill:focus-visible,
 .edit-btn:focus-visible {
-    outline: 3px solid rgba(0, 185, 139, 0.45);
+    outline: 3px solid var(--ring);
     outline-offset: 2px;
 }
  
@@ -477,7 +480,7 @@ button { font-family: inherit; }
 }
  
 .photo-edit svg { width: 18px; height: 18px; }
-.photo-edit:focus-within { outline: 3px solid rgba(0, 185, 139, 0.45); outline-offset: 2px; }
+.photo-edit:focus-within { outline: 3px solid var(--ring); outline-offset: 2px; }
 .photo-edit input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
  
 .section { margin-top: 28px; }
@@ -535,7 +538,7 @@ button { font-family: inherit; }
     padding: 3px 0;
     border-right: 1px solid #444;
     border-bottom: 1px solid #444;
-    background: #F3F7F5;
+    background: var(--soft);
     font-size: 0.65rem;
     text-align: center;
     color: var(--muted);
@@ -560,7 +563,7 @@ button { font-family: inherit; }
 .cell.out .num { color: #BBBBBB; font-weight: 400; }
  
 .cell.today {
-    background: #E9FAF4;
+    background: var(--tint);
     box-shadow: inset 0 0 0 2px var(--teal);
 }
  
@@ -731,7 +734,7 @@ button { font-family: inherit; }
  
 .switch input:checked + .track           { background: var(--teal); }
 .switch input:checked + .track::after    { transform: translateX(20px); }
-.switch input:focus-visible + .track     { outline: 3px solid rgba(0, 185, 139, 0.45); outline-offset: 2px; }
+.switch input:focus-visible + .track     { outline: 3px solid var(--ring); outline-offset: 2px; }
  
 .stepper { display: flex; align-items: center; justify-content: center; gap: 20px; margin: 8px 0 4px; }
  
@@ -750,3 +753,79 @@ button { font-family: inherit; }
 .stepper-value { min-width: 48px; text-align: center; font-size: 2rem; font-weight: 600; }
 .stepper-label { margin: 0 0 20px; text-align: center; color: var(--muted); }
  
+
+/* =====================================================
+   Seasonal theme additions
+   ===================================================== */
+
+/* form inputs inside sheets: focus glow follows the season */
+.sheet .field input:focus { box-shadow: 0 0 0 3px var(--ring); }
+
+/* colours ease over when the season changes */
+.app-screen,
+.tabs,
+.tabs button,
+.pill,
+.avatar-btn,
+.avatar-lg,
+.photo-edit,
+.progress,
+.reminder,
+.streak-badge,
+.cell.today { transition: background-color 0.35s, color 0.35s, border-color 0.35s, box-shadow 0.35s; }
+
+.progress > span { transition: width 0.25s, background-color 0.35s; }
+
+/* season picker in Settings */
+.setting-block          { padding: 6px 0 14px; }
+.setting-block > strong { display: block; margin-bottom: 8px; }
+
+.season-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 4px 0 8px;
+}
+
+.season-opt { position: relative; display: block; cursor: pointer; }
+
+.season-opt input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.season-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 2px 8px;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    background: var(--soft);
+    font-size: 0.78rem;
+}
+
+.season-opt input:checked + .season-card { border-color: var(--teal); background: var(--tint); font-weight: 600; }
+.season-opt input:focus-visible + .season-card { outline: 3px solid var(--ring); outline-offset: 2px; }
+
+.swatch {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+
+/* swatch colours: keep in sync with the --teal of each season in seasons.css */
+.swatch.spring { background: #C93C73; }
+.swatch.summer { background: #0B7F89; }
+.swatch.fall   { background: #B4501C; }
+.swatch.winter { background: #3A6FB0; }
+.swatch.auto   { background: conic-gradient(#C93C73 0 25%, #0B7F89 0 50%, #B4501C 0 75%, #3A6FB0 0); }
+
+.season-caption { margin: 0; text-align: center; }
