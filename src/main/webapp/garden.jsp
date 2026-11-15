@@ -137,11 +137,17 @@
         </button>
 
         <button class="avatar-btn"
-                id="btn-account"
-                type="button"
-                aria-label="Account"
-                disabled>
-        </button>
+		        id="btn-account"
+		        type="button"
+		        aria-label="Account"
+		        aria-controls="account-dialog"
+		        aria-expanded="false">
+		    <%= escapeHtml(
+		        ((sproutbuddy.model.User)
+		            request.getAttribute("currentUser"))
+		            .getUsername().substring(0, 1).toUpperCase()
+		    ) %>
+		</button>
 
     </header>
 
@@ -355,6 +361,108 @@
 
     </section>
 
+
+	<!-- =====================================
+	     ACCOUNT POPUP
+	     ===================================== -->
+	
+	<div id="account-dialog"
+	     class="sheet-backdrop"
+	     hidden>
+	
+	    <div class="sheet"
+	         role="dialog"
+	         aria-modal="true"
+	         aria-labelledby="account-title">
+	
+	        <div class="sheet-handle"></div>
+	
+	        <h2 class="sheet-title" id="account-title">
+	            Account
+	        </h2>
+	
+	        <div class="sheet-form">
+	
+	            
+				<!-- Edit Account Form -->
+				<form action="<%= contextPath %>/account"
+				      method="post"
+				      class="sheet-form">
+				
+				    <input type="hidden"
+				           name="csrfToken"
+				           value="<%= escapeHtml(
+				               (String) request.getAttribute("csrfToken")
+				           ) %>">
+				
+				    <div class="field">
+				
+				        <label for="account-username">
+				            Name
+				        </label>
+				
+				        <input type="text"
+				               id="account-username"
+				               name="username"
+				               maxlength="50"
+				               required
+				               value="<%= escapeHtml(
+				                   (String) request.getAttribute("accountUsername")
+				               ) %>">
+				
+				    </div>
+				
+				    <div class="field">
+				
+				        <label for="account-email">
+				            Email
+				        </label>
+				
+				        <input type="email"
+				               id="account-email"
+				               name="email"
+				               maxlength="100"
+				               required
+				               value="<%= escapeHtml(
+				                   (String) request.getAttribute("accountEmail")
+				               ) %>">
+				
+				    </div>
+				
+				    <button type="submit"
+				            class="btn btn-block">
+				        Save Changes
+				    </button>
+				
+				</form>
+
+	
+	            <form action="<%= contextPath %>/logout"
+	                  method="post">
+	
+	                <input type="hidden"
+	                       name="csrfToken"
+	                       value="<%= escapeHtml(
+	                           (String) request.getAttribute("csrfToken")
+	                       ) %>">
+	
+	                <button type="submit"
+	                        class="btn btn-block btn-outline">
+	                    Log Out
+	                </button>
+	
+	            </form>
+	
+	            <button type="button"
+	                    class="btn btn-block"
+	                    id="close-account">
+	                Close
+	            </button>
+	
+	        </div>
+	    </div>
+	</div>
+
 </main>
 
 <!-- =====================================
@@ -485,6 +593,75 @@ document.addEventListener("DOMContentLoaded", function () {
     window.addEventListener("hashchange", function () {
         showTab(location.hash.slice(1));
     });
+    
+	
+	 // =====================================
+	 // Account popup
+	 // =====================================
+	
+	 const accountButton =
+	     document.getElementById("btn-account");
+	
+	 const accountDialog =
+	     document.getElementById("account-dialog");
+	
+	 const closeAccount =
+	     document.getElementById("close-account");
+	
+	 accountButton.addEventListener("click", function () {
+	
+	     accountDialog.hidden = false;
+	     accountDialog.classList.add("open");
+	
+	     accountButton.setAttribute("aria-expanded", "true");
+	 });
+	
+	 function hideAccount() {
+	
+	     accountDialog.classList.remove("open");
+	     accountDialog.hidden = true;
+	
+	     accountButton.setAttribute("aria-expanded", "false");
+	     accountButton.focus();
+	 }
+	
+	 closeAccount.addEventListener("click", hideAccount);
+	
+	 accountDialog.addEventListener("click", function (event) {
+	
+	     if (event.target === accountDialog) {
+	         hideAccount();
+	     }
+	 });
+	
+	 document.addEventListener("keydown", function (event) {
+	
+	     if (event.key === "Escape" && !accountDialog.hidden) {
+	         hideAccount();
+	     }
+	 });
+
+	// Show account update results.
+	const params = new URLSearchParams(window.location.search);
+
+	const accountStatus = params.get("account");
+	const accountMessage = params.get("message");
+
+	if (accountStatus && accountMessage) {
+
+	    accountDialog.hidden = false;
+	    accountDialog.classList.add("open");
+
+	    accountButton.setAttribute("aria-expanded", "true");
+
+	    const message = document.createElement("p");
+	    message.setAttribute("role", "status");
+	    message.textContent = accountMessage;
+
+	    const form = accountDialog.querySelector("form");
+	    form.parentNode.insertBefore(message, form);
+	};
+
 
 });
 </script>
