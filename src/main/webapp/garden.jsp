@@ -45,7 +45,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1, viewport-fit=cover">
 
-    <meta name="theme-color" content="#DDF7F0">
+    <meta name="theme-color" content="#DDF7F0" data-seasonal>
 
     <title>Your Garden | SproutBuddy</title>
 
@@ -65,6 +65,11 @@
 
     <link rel="stylesheet"
           href="<%= contextPath %>/css/app.css">
+    <link rel="stylesheet"
+          href="<%= contextPath %>/css/seasons.css">
+
+    <!-- Seasonal theme: loads in <head> so the colours are right before anything draws -->
+    <script src="<%= contextPath %>/js/theme.js"></script>
 
     <style>
         /* Garden-specific additions */
@@ -132,8 +137,7 @@
         <button class="icon-btn"
                 id="btn-settings"
                 type="button"
-                aria-label="Settings"
-                disabled>
+                aria-label="Settings">
         </button>
 
         <button class="avatar-btn"
@@ -462,6 +466,8 @@
 	        </div>
 	    </div>
 	</div>
+
+<%@ include file="/WEB-INF/jspf/settings-dialog.jspf" %>
 
 </main>
 
