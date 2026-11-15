@@ -12,16 +12,6 @@ Guadalupe Carrillo Vega, Matilda Verdejo, Hung Phan, Kyle James
  
 ---
  
-## Table of contents
- 
-1. [Project overview](#project-overview)
-2. [Features](#features)
-3. [Tech stack](#tech-stack)
-4. [Set up](#set-up)
-5. [Project structure](#project-structure)
-6. [App pages and routes](#app-pages-and-routes)
----
- 
 ## Features
  
 - **Plant Details Database:** a database of plant information that users pick from, plus a way to add custom plants that are not in the database.
