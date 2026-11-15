@@ -103,6 +103,16 @@
             white-space: pre-wrap;
             overflow-wrap: anywhere;
         }
+        
+		#delete-plant-form {
+		    margin-top: 16px;
+		}
+		
+		#delete-plant-button {
+		    width: 100%;
+		    background-color: #dc3545;
+		    color: white;
+		}
     </style>
 </head>
 
@@ -118,7 +128,7 @@
 
         <a class="icon-btn"
            id="btn-back"
-           href="<%= request.getContextPath() %>/garden.html"
+           href="<%= request.getContextPath() %>/garden#garden"
            aria-label="Back to your garden">
             &#8592;
         </a>
@@ -494,6 +504,43 @@
             </form>
 
         </section>
+        
+        
+	<!-- =====================================
+	     DELETE PLANT
+	     ===================================== -->
+	
+	<section class="section">
+	
+	    <div class="section-head">
+	        <span class="pill">Manage Plant</span>
+	    </div>
+	
+	    <form
+	        id="delete-plant-form"
+	        action="<%= request.getContextPath() %>/delete-plant"
+	        method="post">
+	
+	        <input type="hidden"
+	               name="id"
+	               value="<%= plant.getPlantId() %>">
+	
+	        <input type="hidden"
+	               name="csrfToken"
+	               value="<%= escapeHtml(
+	                   (String) request.getAttribute("csrfToken")
+	               ) %>">
+	
+	        <button type="submit"
+	                class="btn"
+	                id="delete-plant-button">
+	            Delete Plant
+	        </button>
+	
+	    </form>
+	
+	</section>
+	        
 
     </div>
 
@@ -591,6 +638,27 @@ document.addEventListener("DOMContentLoaded", function () {
     // Forms submit normally to PlantProfileServlet.
     // The servlet updates MySQL and redirects
     // back to the refreshed profile.
+    
+
+	 // =====================================
+	 // Confirm plant deletion
+	 // =====================================
+	
+	 const deleteForm =
+	     document.getElementById("delete-plant-form");
+	
+	 deleteForm.addEventListener("submit", function (event) {
+	
+	     const confirmed = window.confirm(
+	         "Are you sure you want to delete this plant? " +
+	         "This will also remove its care history and reminders."
+	     );
+	
+	     if (!confirmed) {
+	         event.preventDefault();
+	     }
+	 });
+
 
 });
 </script>
