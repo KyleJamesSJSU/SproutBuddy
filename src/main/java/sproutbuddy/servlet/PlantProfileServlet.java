@@ -80,6 +80,25 @@ public class PlantProfileServlet extends HttpServlet {
             }
 
             request.setAttribute("plant", plant);
+            
+         // Create a CSRF token once per authenticated session.
+            String csrfToken = (String) session.getAttribute("csrfToken");
+
+            if (csrfToken == null) {
+                byte[] randomBytes = new byte[32];
+
+                new java.security.SecureRandom()
+                    .nextBytes(randomBytes);
+
+                csrfToken = java.util.Base64.getUrlEncoder()
+                    .withoutPadding()
+                    .encodeToString(randomBytes);
+
+                session.setAttribute("csrfToken", csrfToken);
+            }
+
+            request.setAttribute("csrfToken", csrfToken);
+            
 
             request.getRequestDispatcher("/plantProfile.jsp")
                    .forward(request, response);

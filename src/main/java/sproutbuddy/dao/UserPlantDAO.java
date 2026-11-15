@@ -56,8 +56,17 @@ public class UserPlantDAO {
 
         List<UserPlant> plants = new ArrayList<>();
 
-        String sql = "SELECT * FROM user_plants "
-                   + "WHERE user_id = ? ORDER BY date_added DESC";
+        String sql =
+                "SELECT up.*, "
+              + "ps.common_name, ps.scientific_name, "
+              + "ps.light_requirement, ps.water_requirement, "
+              + "ps.care_instructions, ps.is_custom, "
+              + "ps.created_by_user_id "
+              + "FROM user_plants up "
+              + "JOIN plant_species ps "
+              + "ON up.species_id = ps.species_id "
+              + "WHERE up.user_id = ? "
+              + "ORDER BY up.date_added DESC, up.plant_id DESC";
 
         try (Connection con = DBConnection.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -67,7 +76,25 @@ public class UserPlantDAO {
             try (ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
-                    plants.add(mapRowToPlant(rs));
+                	// Convert database row into a UserPlant
+                    UserPlant plant = mapRowToPlant(rs);
+
+                    // Create the associated PlantSpecies object
+                    PlantSpecies species = new PlantSpecies(
+                        rs.getInt("species_id"),
+                        rs.getString("common_name"),
+                        rs.getString("scientific_name"),
+                        rs.getString("light_requirement"),
+                        rs.getString("water_requirement"),
+                        rs.getString("care_instructions"),
+                        rs.getBoolean("is_custom"),
+                        (Integer) rs.getObject("created_by_user_id")
+                    );
+
+                    // Associate species information with the plant
+                    plant.setSpecies(species);
+
+                    plants.add(plant);
                 }
             }
         }
@@ -200,4 +227,27 @@ public class UserPlantDAO {
 	}
 
 
+	/**
+	 * Deletes a plant belonging to the specified user.
+	 *
+	 * @return true if exactly one plant was deleted
+	 */
+	public boolean deletePlant(int plantId, int userId)
+	        throws Exception {
+	
+	    String sql = "DELETE FROM user_plants "
+	               + "WHERE plant_id = ? AND user_id = ?";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setInt(1, plantId);
+	        stmt.setInt(2, userId);
+	
+	        return stmt.executeUpdate() == 1;
+	    }
+	}
+
+	
+	
 }

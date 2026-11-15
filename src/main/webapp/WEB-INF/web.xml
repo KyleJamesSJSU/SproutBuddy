@@ -49,4 +49,41 @@
         <servlet-name>PlantProfileServlet</servlet-name>
         <url-pattern>/plant-profile</url-pattern>
     </servlet-mapping>
+    
+	<!-- Garden Dashboard Servlet -->
+	<servlet>
+	    <servlet-name>GardenServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.GardenServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>GardenServlet</servlet-name>
+	    <url-pattern>/garden</url-pattern>
+	</servlet-mapping>
+    
+    
+	<!-- Add Plant Servlet -->
+	<servlet>
+	    <servlet-name>AddPlantServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.AddPlantServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>AddPlantServlet</servlet-name>
+	    <url-pattern>/add-plant</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- Delete Plant Servlet -->
+	<servlet>
+	    <servlet-name>DeletePlantServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.DeletePlantServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>DeletePlantServlet</servlet-name>
+	    <url-pattern>/delete-plant</url-pattern>
+	</servlet-mapping>
+	
+	    
 </web-app>
