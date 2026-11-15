@@ -85,5 +85,30 @@
 	    <url-pattern>/delete-plant</url-pattern>
 	</servlet-mapping>
 	
+	
+	<!-- Logout Servlet -->
+	<servlet>
+	    <servlet-name>LogoutServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.LogoutServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>LogoutServlet</servlet-name>
+	    <url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+	
+	
+	<!-- Account Management Servlet -->
+	<servlet>
+	    <servlet-name>AccountServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.AccountServlet</servlet-class>
+	</servlet>
+	
+	<servlet-mapping>
+	    <servlet-name>AccountServlet</servlet-name>
+	    <url-pattern>/account</url-pattern>
+	</servlet-mapping>
+		
+	
 	    
 </web-app>

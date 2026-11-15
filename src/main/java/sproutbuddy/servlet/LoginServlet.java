@@ -71,6 +71,6 @@ public class LoginServlet extends HttpServlet {
         session.setAttribute("user", user);
         session.setMaxInactiveInterval(30 * 60);
 
-        response.sendRedirect(request.getContextPath() + "/garden.html");
+        response.sendRedirect(request.getContextPath() + "/garden#reminders");
     }
 }

@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import sproutbuddy.dao.UserDAO;
 import sproutbuddy.dao.UserPlantDAO;
 import sproutbuddy.model.User;
 import sproutbuddy.model.UserPlant;
@@ -21,10 +22,12 @@ public class GardenServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private UserPlantDAO userPlantDAO;
+    private UserDAO userDAO;
 
     @Override
     public void init() {
         userPlantDAO = new UserPlantDAO();
+        userDAO = new UserDAO();
     }
 
     // =====================================
@@ -49,6 +52,29 @@ public class GardenServlet extends HttpServlet {
         }
 
         User user = (User) session.getAttribute("user");
+        
+
+	     // Generate a CSRF token if the session doesn't have one.
+	     String csrfToken =
+	             (String) session.getAttribute("csrfToken");
+	
+	     if (csrfToken == null) {
+	
+	         byte[] randomBytes = new byte[32];
+	
+	         new java.security.SecureRandom()
+	             .nextBytes(randomBytes);
+	
+	         csrfToken = java.util.Base64.getUrlEncoder()
+	             .withoutPadding()
+	             .encodeToString(randomBytes);
+	
+	         session.setAttribute("csrfToken", csrfToken);
+	     }
+	
+	     request.setAttribute("csrfToken", csrfToken);
+	     request.setAttribute("currentUser", user);
+
 
         try {
 
@@ -56,6 +82,21 @@ public class GardenServlet extends HttpServlet {
             List<UserPlant> plants =
                     userPlantDAO.getPlantsByUserId(user.getId());
 
+
+	         // Retrieve the authenticated user's account details.
+	         String[] account = userDAO.getAccountById(user.getId());
+	
+	         if (account == null) {
+	             response.sendError(
+	                 HttpServletResponse.SC_NOT_FOUND,
+	                 "Account not found.");
+	             return;
+	         }
+	
+	         request.setAttribute("accountUsername", account[0]);
+	         request.setAttribute("accountEmail", account[1]);
+
+            
             // Pass the plants to the JSP
             request.setAttribute("plants", plants);
 

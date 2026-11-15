@@ -100,4 +100,57 @@ public class UserDAO {
             }
         }
     }
+    
+    
+	/**
+	 * Retrieves account information for a specific user.
+	 */
+	public String[] getAccountById(int userId)
+	        throws Exception {
+	
+	    String sql =
+	        "SELECT username, email FROM users WHERE user_id = ?";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setInt(1, userId);
+	
+	        try (ResultSet rs = stmt.executeQuery()) {
+	
+	            if (rs.next()) {
+	                return new String[] {
+	                    rs.getString("username"),
+	                    rs.getString("email")
+	                };
+	            }
+	        }
+	    }
+	
+	    return null;
+	}
+	
+	/**
+	 * Updates the username and email for an authenticated user.
+	 */
+	public boolean updateAccount(
+	        int userId,
+	        String username,
+	        String email) throws Exception {
+	
+	    String sql =
+	        "UPDATE users SET username = ?, email = ? "
+	      + "WHERE user_id = ?";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setString(1, username);
+	        stmt.setString(2, email);
+	        stmt.setInt(3, userId);
+	
+	        return stmt.executeUpdate() == 1;
+	    }
+	}
+
 }
