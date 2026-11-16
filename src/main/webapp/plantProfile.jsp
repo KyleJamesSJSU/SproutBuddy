@@ -2,6 +2,11 @@
 <%@ page contentType="text/html; charset=UTF-8"
          pageEncoding="UTF-8" %>
 
+<%@ page import="java.util.List" %>
+<%@ page import="sproutbuddy.model.CareTask" %>
+<%@ page import="java.time.LocalDate" %>
+
+
 <%!
     // Escape database text before displaying it in HTML
     private String escapeHtml(String value) {
@@ -29,6 +34,16 @@
         return;
     }
 %>
+
+<%
+    @SuppressWarnings("unchecked")
+    List<CareTask> plantReminders =
+        (List<CareTask>)
+            request.getAttribute("plantReminders");
+
+    LocalDate today = LocalDate.now();
+%>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -368,6 +383,90 @@
             </div>
 
         </section>
+
+		
+		<!-- =====================================
+		     PLANT-SPECIFIC CARE REMINDERS
+		     ===================================== -->
+		
+		<section class="section">
+		
+		    <div class="section-head">
+		        <span class="pill">Care Reminders</span>
+		    </div>
+		
+		    <% if (plantReminders == null ||
+		           plantReminders.isEmpty()) { %>
+		
+		        <div class="detail">
+		            <p>
+		                No upcoming care reminders for this plant.
+		            </p>
+		        </div>
+		
+		    <% } else { %>
+		
+		        <% for (CareTask task : plantReminders) {
+		
+		            LocalDate dueDate =
+		                task.getDueDate().toLocalDate();
+		
+		            boolean overdue = dueDate.isBefore(today);
+		            boolean dueToday = dueDate.isEqual(today);
+		
+		            String taskName = task.getTaskType();
+		
+		            String displayName =
+		                taskName.substring(0, 1).toUpperCase()
+		                + taskName.substring(1);
+		        %>
+		
+		            <div class="detail">
+		
+		                <div>
+		                    <p class="detail-label">
+		                        <%= escapeHtml(displayName) %>
+		                    </p>
+		
+		                    <p>
+		                        Due: <%= dueDate %>
+		                    </p>
+		
+		                    <p>
+		                        Every <%= task.getIntervalDays() %> days
+		                    </p>
+		                </div>
+		
+		                <% if (overdue) { %>
+		
+		                    <span class="detail-pill"
+		                          style="background:#ffe5e5;color:#a33;">
+		                        Overdue
+		                    </span>
+		
+		                <% } else if (dueToday) { %>
+		
+		                    <span class="detail-pill water">
+		                        Due Today
+		                    </span>
+		
+		                <% } else { %>
+		
+		                    <span class="detail-pill sun">
+		                        Upcoming
+		                    </span>
+		
+		                <% } %>
+		
+		            </div>
+		
+		        <% } %>
+		
+		    <% } %>
+		
+		</section>
+
+
 
         <!-- =====================================
              CARE INSTRUCTIONS
