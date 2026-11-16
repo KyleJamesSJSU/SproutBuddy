@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import sproutbuddy.dao.UserPlantDAO;
+import sproutbuddy.dao.CareTaskDAO;
 import sproutbuddy.model.User;
 import sproutbuddy.model.UserPlant;
 
@@ -20,10 +21,12 @@ public class PlantProfileServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     private UserPlantDAO userPlantDAO;
+    private CareTaskDAO careTaskDAO;
 
     @Override
     public void init() {
         userPlantDAO = new UserPlantDAO();
+        careTaskDAO = new CareTaskDAO();
     }
 
     // =====================================
@@ -80,6 +83,17 @@ public class PlantProfileServlet extends HttpServlet {
             }
 
             request.setAttribute("plant", plant);
+            
+
+	         // Retrieve open reminders for this specific plant.
+	         request.setAttribute(
+	             "plantReminders",
+	             careTaskDAO.getOpenTasksForPlant(
+	                 plantId,
+	                 userId
+	             )
+	         );
+
             
          // Create a CSRF token once per authenticated session.
             String csrfToken = (String) session.getAttribute("csrfToken");

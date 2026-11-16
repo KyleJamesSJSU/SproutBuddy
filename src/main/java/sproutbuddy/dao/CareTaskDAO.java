@@ -50,4 +50,59 @@ public class CareTaskDAO {
             }
         }
     }
+
+	/**
+	 * Retrieves all incomplete care reminders for one plant.
+	 *
+	 * Verifies plant ownership using the authenticated user ID.
+	 * Does not modify reminders or scheduling.
+	 */
+	public List<CareTask> getOpenTasksForPlant(
+	        int plantId, int userId) throws Exception {
+	
+	    List<CareTask> tasks = new ArrayList<>();
+	
+	    String sql =
+	        "SELECT t.task_id, p.nickname, "
+	      + "s.common_name, t.task_type, "
+	      + "t.due_date, ct.interval_days "
+	      + "FROM care_tasks t "
+	      + "JOIN user_plants p "
+	      + "ON p.plant_id = t.plant_id "
+	      + "JOIN plant_species s "
+	      + "ON s.species_id = p.species_id "
+	      + "JOIN care_templates ct "
+	      + "ON ct.species_id = p.species_id "
+	      + "AND ct.task_type = t.task_type "
+	      + "WHERE t.plant_id = ? "
+	      + "AND p.user_id = ? "
+	      + "AND t.completed_at IS NULL "
+	      + "ORDER BY t.due_date, t.task_type";
+	
+	    try (Connection con = DBConnection.getConnection();
+	         PreparedStatement stmt = con.prepareStatement(sql)) {
+	
+	        stmt.setInt(1, plantId);
+	        stmt.setInt(2, userId);
+	
+	        try (ResultSet rs = stmt.executeQuery()) {
+	
+	            while (rs.next()) {
+	
+	                CareTask task = new CareTask(
+	                    rs.getInt("task_id"),
+	                    rs.getString("nickname"),
+	                    rs.getString("common_name"),
+	                    rs.getString("task_type"),
+	                    rs.getDate("due_date"),
+	                    rs.getInt("interval_days")
+	                );
+	
+	                tasks.add(task);
+	            }
+	        }
+	    }
+	
+	    return tasks;
+	}
 }
