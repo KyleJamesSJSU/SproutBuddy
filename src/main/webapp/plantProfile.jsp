@@ -76,6 +76,11 @@
 
     <link rel="stylesheet"
           href="<%= request.getContextPath() %>/css/app.css">
+    <link rel="stylesheet"
+          href="<%= request.getContextPath() %>/css/seasons.css">
+
+    <!-- Seasonal theme: loads in <head> so the colours are right before anything draws -->
+    <script src="<%= request.getContextPath() %>/js/theme.js"></script>
 
     <style>
         /* Hide editing forms by default */
@@ -153,8 +158,7 @@
             <button class="icon-btn"
                     id="btn-settings"
                     type="button"
-                    aria-label="Settings"
-                    disabled>
+                    aria-label="Settings">
             </button>
 
             <button class="avatar-btn"
@@ -642,6 +646,8 @@
 	        
 
     </div>
+
+<%@ include file="/WEB-INF/jspf/settings-dialog.jspf" %>
 
 </main>
 

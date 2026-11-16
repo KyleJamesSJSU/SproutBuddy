@@ -1,0 +1,59 @@
+/* =====================================================
+   SproutBuddy – seasons.css
+   Seasonal colour themes for the app screens (dashboard,
+   plant profile, add plant). js/theme.js sets
+   <html data-season="spring|summer|fall|winter">.
+
+   The log-in and sign-up pages never load this file, so
+   they look the same all year.
+
+   Each season overrides the same variables:
+     --mint       screen background
+     --teal       buttons, active tab, highlights
+     --teal-dark  hover + accent text
+     --tint       light highlight (today in the calendar, selected options)
+     --soft       very light panel background
+     --line       soft borders
+     --ring       keyboard-focus outline
+   (White text on --teal passes contrast in every season.)
+   ===================================================== */
+
+html[data-season="spring"] {
+    --mint:      #FBE8F0;
+    --teal:      #C93C73;
+    --teal-dark: #A12C59;
+    --tint:      #FFF1F6;
+    --soft:      #FCF3F7;
+    --line:      #F0CADA;
+    --ring:      rgba(201, 60, 115, 0.40);
+}
+
+html[data-season="summer"] {
+    --mint:      #FFF3C4;
+    --teal:      #0B7F89;
+    --teal-dark: #086068;
+    --tint:      #FFF9DE;
+    --soft:      #FFFBEA;
+    --line:      #EBDDA0;
+    --ring:      rgba(11, 127, 137, 0.40);
+}
+
+html[data-season="fall"] {
+    --mint:      #FCE6D0;
+    --teal:      #B4501C;
+    --teal-dark: #8E3C12;
+    --tint:      #FFF2E5;
+    --soft:      #FFF7EF;
+    --line:      #EDCDB0;
+    --ring:      rgba(180, 80, 28, 0.40);
+}
+
+html[data-season="winter"] {
+    --mint:      #E3EEFA;
+    --teal:      #3A6FB0;
+    --teal-dark: #27538A;
+    --tint:      #F0F6FD;
+    --soft:      #F5F9FD;
+    --line:      #C5D6EA;
+    --ring:      rgba(58, 111, 176, 0.40);
+}

@@ -43,6 +43,11 @@
           href="<%= contextPath %>/css/auth.css">
     <link rel="stylesheet"
           href="<%= contextPath %>/css/app.css">
+    <link rel="stylesheet"
+          href="<%= contextPath %>/css/seasons.css">
+
+    <!-- Seasonal theme: loads in <head> so the colours are right before anything draws -->
+    <script src="<%= contextPath %>/js/theme.js"></script>
 
     <style>
         .add-plant-content {
