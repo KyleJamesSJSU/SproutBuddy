@@ -318,12 +318,27 @@
 
             <div class="garden-tab-message">
 
-                <h2>Friends</h2>
+                <div class="friends-heading">
+                    <h2>Friends’ streaks</h2>
+                    <button class="friend-add-main"
+                            id="friend-add-button"
+                            type="button">
+                        + Add friends
+                    </button>
+                </div>
 
-                <p>
-                    Friends and shared plant care streaks
-                    are coming soon.
-                </p>
+                <p>Plant care over the last 7 days</p>
+                <div class="friend-search-panel"
+                     id="friend-search-panel"
+                     hidden="hidden">
+                    <input class="friend-search"
+                           id="friend-search"
+                           type="search"
+                           placeholder="Search people"
+                           aria-label="Search people">
+                    <div class="friend-matches" id="friend-matches"></div>
+                </div>
+                <ul class="friend-list" id="friend-list"></ul>
 
             </div>
 
@@ -402,7 +417,7 @@
 				    <div class="field">
 				
 				        <label for="account-username">
-				            Name
+				            Username
 				        </label>
 				
 				        <input type="text"
@@ -489,6 +504,19 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     const tabs = document.querySelectorAll(".tabs button");
+    const addFriendButton = document.getElementById("friend-add-button");
+    const friendList = document.getElementById("friend-list");
+    const friendSearchPanel = document.getElementById("friend-search-panel");
+    const friendSearch = document.getElementById("friend-search");
+    const friendMatches = document.getElementById("friend-matches");
+    const friendDirectory = [
+        "Priya",
+        "Jordan",
+        "Sam",
+        "Alex",
+        "Maya",
+        "Leo"
+    ];
 
     const panels = {
         garden: document.getElementById("panel-garden"),
@@ -528,6 +556,127 @@ document.addEventListener("DOMContentLoaded", function () {
             showTab(tab.dataset.tab);
         });
     });
+
+    function renderFriends() {
+        if (!friendList) return;
+
+        let friends = [];
+        try {
+            friends = JSON.parse(localStorage.getItem("sproutbuddy-friends")) || [];
+        } catch (e) {
+            friends = [];
+        }
+
+        friendList.replaceChildren();
+        friends.forEach(function (friend) {
+            const item = document.createElement("li");
+            item.className = "friend";
+
+            const avatar = document.createElement("div");
+            avatar.className = "friend-avatar";
+            avatar.style.background = "#00B98B";
+            avatar.textContent = friend.name.charAt(0).toUpperCase();
+
+            const main = document.createElement("div");
+            main.className = "friend-main";
+
+            const name = document.createElement("div");
+            name.className = "friend-name";
+            name.textContent = friend.name;
+
+            const last = document.createElement("div");
+            last.className = "friend-last";
+            last.textContent = "New friend · start a care streak";
+
+            main.append(name, last);
+
+            const badge = document.createElement("span");
+            badge.className = "streak-badge";
+            badge.textContent = "0 days";
+
+            item.append(avatar, main, badge);
+            friendList.append(item);
+        });
+    }
+
+    if (addFriendButton) {
+        addFriendButton.addEventListener("click", function () {
+            friendSearchPanel.hidden = !friendSearchPanel.hidden;
+            if (!friendSearchPanel.hidden) {
+                friendSearch.value = "";
+                renderFriendMatches();
+                friendSearch.focus();
+            }
+        });
+    }
+
+    function getSavedFriends() {
+        try {
+            return JSON.parse(localStorage.getItem("sproutbuddy-friends")) || [];
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function renderFriendMatches() {
+        if (!friendMatches || !friendSearch) return;
+
+        const query = friendSearch.value.trim().toLowerCase();
+        const saved = getSavedFriends();
+        const matches = friendDirectory.filter(function (name) {
+            return name.toLowerCase().includes(query);
+        });
+
+        friendMatches.replaceChildren();
+
+        if (matches.length === 0) {
+            const empty = document.createElement("p");
+            empty.className = "empty friend-no-match";
+            empty.textContent = "No people found.";
+            friendMatches.append(empty);
+            return;
+        }
+
+        matches.forEach(function (name) {
+            const row = document.createElement("div");
+            row.className = "friend-match";
+
+            const strong = document.createElement("strong");
+            strong.textContent = name;
+
+            const added = saved.some(function (friend) {
+                return friend.name.toLowerCase() === name.toLowerCase();
+            });
+
+            if (added) {
+                const label = document.createElement("span");
+                label.className = "friend-added";
+                label.textContent = "Added";
+                row.append(strong, label);
+            } else {
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "friend-add";
+                button.textContent = "Add";
+                button.addEventListener("click", function () {
+                    const friends = getSavedFriends();
+                    friends.push({ name: name });
+                    localStorage.setItem("sproutbuddy-friends", JSON.stringify(friends));
+                    renderFriends();
+                    renderFriendMatches();
+                });
+                row.append(strong, button);
+            }
+
+            friendMatches.append(row);
+        });
+    }
+
+    if (friendSearch) {
+        friendSearch.addEventListener("input", renderFriendMatches);
+    }
+
+    renderFriends();
 
     // =====================================
     // Garden carousel

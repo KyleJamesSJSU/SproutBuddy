@@ -113,7 +113,7 @@
             el('div', { class: 'account-top' },
                 el('div', { class: 'avatar-lg', text: (user.name[0] || '?').toUpperCase() }),
                 el('p', { class: 'muted', text: 'Your SproutBuddy account' })),
-            field('Name', name),
+            field('Username', name),
             field('Email', email),
             el('button', { type: 'submit', class: 'btn btn-block', text: 'Save changes' }),
             el('button', {

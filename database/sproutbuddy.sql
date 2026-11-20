@@ -81,6 +81,9 @@ CREATE TABLE user_plants (
     date_added DATE NOT NULL DEFAULT (CURRENT_DATE),
     location VARCHAR(100),
     photo VARCHAR(255),
+    watering_interval_days INT,
+    last_watered DATE,
+    notes TEXT,
  
     FOREIGN KEY (user_id)
         REFERENCES users(user_id)

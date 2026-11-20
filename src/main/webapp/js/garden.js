@@ -207,10 +207,36 @@
  
     function renderFriends() {
         const friends = state.friends.slice().sort(function (a, b) { return b.streak - a.streak; });
+        const addButton = el('button', {
+            type: 'button',
+            class: 'friend-add-main',
+            text: '+ Add friends',
+            onclick: function () {
+                const name = window.prompt('Enter a friend name');
+                if (!name || !name.trim()) return;
+
+                const friendName = name.trim();
+                if (state.friends.some(function (friend) {
+                    return friend.name.toLowerCase() === friendName.toLowerCase();
+                })) return;
+
+                state.friends.push({
+                    id: Date.now(),
+                    name: friendName,
+                    streak: 0,
+                    last: 'New friend · start a care streak',
+                    week: [0, 0, 0, 0, 0, 0, 0]
+                });
+                SB.save();
+                renderFriends();
+            }
+        });
  
         friendsPanel.replaceChildren(
             el('div', { class: 'panel-head' },
-                el('h2', { text: 'Friends\u2019 streaks' }),
+                el('div', { class: 'friends-heading' },
+                    el('h2', { text: 'Friends\u2019 streaks' }),
+                    addButton),
                 el('p', { text: 'Plant care over the last 7 days' })),
             el('div', { style: 'height:16px' }),
             el('ul', { class: 'friend-list' }, friends.map(function (f, i) {
