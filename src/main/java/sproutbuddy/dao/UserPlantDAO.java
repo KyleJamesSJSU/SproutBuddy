@@ -156,7 +156,7 @@ public class UserPlantDAO {
             throws SQLException {
 
         java.sql.Date dateAdded = rs.getDate("date_added");
-        java.sql.Date lastWatered = rs.getDate("last_watered");
+        java.sql.Date lastWatered = getOptionalDate(rs, "last_watered");
 
         return new UserPlant(
             rs.getInt("plant_id"),
@@ -166,10 +166,37 @@ public class UserPlantDAO {
             dateAdded == null ? null : dateAdded.toLocalDate(),
             rs.getString("location"),
             rs.getString("photo"),
-            (Integer) rs.getObject("watering_interval_days"),
+            getOptionalInteger(rs, "watering_interval_days"),
             lastWatered == null ? null : lastWatered.toLocalDate(),
-            rs.getString("notes")
+            getOptionalString(rs, "notes")
         );
+    }
+
+    private java.sql.Date getOptionalDate(ResultSet rs, String column)
+            throws SQLException {
+        try {
+            return rs.getDate(column);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private Integer getOptionalInteger(ResultSet rs, String column)
+            throws SQLException {
+        try {
+            return (Integer) rs.getObject(column);
+        } catch (SQLException e) {
+            return null;
+        }
+    }
+
+    private String getOptionalString(ResultSet rs, String column)
+            throws SQLException {
+        try {
+            return rs.getString(column);
+        } catch (SQLException e) {
+            return null;
+        }
     }
     
 
