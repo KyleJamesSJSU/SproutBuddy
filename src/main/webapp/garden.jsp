@@ -3,6 +3,8 @@
          pageEncoding="UTF-8" %>
 
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Collections" %>
+<%@ page import="sproutbuddy.model.User" %>
 <%@ page import="sproutbuddy.model.UserPlant" %>
 
 <%!
@@ -23,6 +25,12 @@
     @SuppressWarnings("unchecked")
     List<UserPlant> plants =
         (List<UserPlant>) request.getAttribute("plants");
+    @SuppressWarnings("unchecked")
+    List<User> friends =
+        (List<User>) request.getAttribute("friends");
+    if (friends == null) {
+        friends = Collections.emptyList();
+    }
 
     // The page should only be accessed through GardenServlet.
     if (plants == null) {
@@ -64,7 +72,7 @@
           href="<%= contextPath %>/css/auth.css">
 
     <link rel="stylesheet"
-          href="<%= contextPath %>/css/app.css">
+          href="<%= contextPath %>/css/app.css?v=friends-button-20261124">
     <link rel="stylesheet"
           href="<%= contextPath %>/css/seasons.css">
 
@@ -320,16 +328,22 @@
 
                 <div class="friends-heading">
                     <h2>Friends’ streaks</h2>
+                </div>
+
+                <p>Plant care over the last 7 days</p>
+                <div class="friend-action-row">
                     <button class="friend-add-main"
                             id="friend-add-button"
                             type="button">
                         + Add friends
                     </button>
                 </div>
-
-                <p>Plant care over the last 7 days</p>
                 <div class="friend-search-panel"
                      id="friend-search-panel"
+                     data-friends-url="<%= escapeHtml(contextPath + "/friends") %>"
+                     data-csrf-token="<%= escapeHtml(
+                         (String) request.getAttribute("csrfToken")
+                     ) %>"
                      hidden="hidden">
                     <input class="friend-search"
                            id="friend-search"
@@ -337,8 +351,23 @@
                            placeholder="Search people"
                            aria-label="Search people">
                     <div class="friend-matches" id="friend-matches"></div>
+                    <p class="friend-search-status" id="friend-search-status"
+                       role="status" aria-live="polite"></p>
                 </div>
-                <ul class="friend-list" id="friend-list"></ul>
+                <ul class="friend-list" id="friend-list">
+                    <% for (User friend : friends) { %>
+                        <li class="friend" data-user-id="<%= friend.getId() %>">
+                            <div class="friend-avatar">
+                                <%= escapeHtml(friend.getUsername().substring(0, 1).toUpperCase()) %>
+                            </div>
+                            <div class="friend-main">
+                                <div class="friend-name"><%= escapeHtml(friend.getUsername()) %></div>
+                                <div class="friend-last">Connected SproutBuddy user</div>
+                            </div>
+                            <span class="streak-badge">Connected</span>
+                        </li>
+                    <% } %>
+                </ul>
 
             </div>
 
@@ -509,14 +538,10 @@ document.addEventListener("DOMContentLoaded", function () {
     const friendSearchPanel = document.getElementById("friend-search-panel");
     const friendSearch = document.getElementById("friend-search");
     const friendMatches = document.getElementById("friend-matches");
-    const friendDirectory = [
-        "Priya",
-        "Jordan",
-        "Sam",
-        "Alex",
-        "Maya",
-        "Leo"
-    ];
+    const friendSearchStatus = document.getElementById("friend-search-status");
+    const friendsUrl = friendSearchPanel.dataset.friendsUrl;
+    const csrfToken = friendSearchPanel.dataset.csrfToken;
+    let searchRequest = 0;
 
     const panels = {
         garden: document.getElementById("panel-garden"),
@@ -557,48 +582,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    function renderFriends() {
-        if (!friendList) return;
-
-        let friends = [];
-        try {
-            friends = JSON.parse(localStorage.getItem("sproutbuddy-friends")) || [];
-        } catch (e) {
-            friends = [];
-        }
-
-        friendList.replaceChildren();
-        friends.forEach(function (friend) {
-            const item = document.createElement("li");
-            item.className = "friend";
-
-            const avatar = document.createElement("div");
-            avatar.className = "friend-avatar";
-            avatar.style.background = "#00B98B";
-            avatar.textContent = friend.name.charAt(0).toUpperCase();
-
-            const main = document.createElement("div");
-            main.className = "friend-main";
-
-            const name = document.createElement("div");
-            name.className = "friend-name";
-            name.textContent = friend.name;
-
-            const last = document.createElement("div");
-            last.className = "friend-last";
-            last.textContent = "New friend · start a care streak";
-
-            main.append(name, last);
-
-            const badge = document.createElement("span");
-            badge.className = "streak-badge";
-            badge.textContent = "0 days";
-
-            item.append(avatar, main, badge);
-            friendList.append(item);
-        });
-    }
-
     if (addFriendButton) {
         addFriendButton.addEventListener("click", function () {
             friendSearchPanel.hidden = !friendSearchPanel.hidden;
@@ -610,73 +593,112 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    function getSavedFriends() {
-        try {
-            return JSON.parse(localStorage.getItem("sproutbuddy-friends")) || [];
-        } catch (e) {
-            return [];
-        }
+    function showFriendError(message) {
+        friendSearchStatus.textContent = message;
     }
 
-    function renderFriendMatches() {
+    function addFriendToList(user) {
+        if (friendList.querySelector('[data-user-id="' + user.id + '"]')) return;
+
+        const item = document.createElement("li");
+        item.className = "friend";
+        item.dataset.userId = user.id;
+
+        const avatar = document.createElement("div");
+        avatar.className = "friend-avatar";
+        avatar.textContent = user.username.charAt(0).toUpperCase();
+
+        const main = document.createElement("div");
+        main.className = "friend-main";
+        const name = document.createElement("div");
+        name.className = "friend-name";
+        name.textContent = user.username;
+        const description = document.createElement("div");
+        description.className = "friend-last";
+        description.textContent = "Connected SproutBuddy user";
+        main.append(name, description);
+
+        const badge = document.createElement("span");
+        badge.className = "streak-badge";
+        badge.textContent = "Connected";
+
+        item.append(avatar, main, badge);
+        friendList.append(item);
+    }
+
+    async function renderFriendMatches() {
         if (!friendMatches || !friendSearch) return;
 
-        const query = friendSearch.value.trim().toLowerCase();
-        const saved = getSavedFriends();
-        const matches = friendDirectory.filter(function (name) {
-            return name.toLowerCase().includes(query);
-        });
-
+        const requestId = ++searchRequest;
+        friendSearchStatus.textContent = "Searching users…";
         friendMatches.replaceChildren();
-
-        if (matches.length === 0) {
-            const empty = document.createElement("p");
-            empty.className = "empty friend-no-match";
-            empty.textContent = "No people found.";
-            friendMatches.append(empty);
-            return;
-        }
-
-        matches.forEach(function (name) {
-            const row = document.createElement("div");
-            row.className = "friend-match";
-
-            const strong = document.createElement("strong");
-            strong.textContent = name;
-
-            const added = saved.some(function (friend) {
-                return friend.name.toLowerCase() === name.toLowerCase();
+        try {
+            const response = await fetch(friendsUrl + "?query="
+                    + encodeURIComponent(friendSearch.value.trim()), {
+                headers: { Accept: "application/json" }
             });
-
-            if (added) {
-                const label = document.createElement("span");
-                label.className = "friend-added";
-                label.textContent = "Added";
-                row.append(strong, label);
-            } else {
-                const button = document.createElement("button");
-                button.type = "button";
-                button.className = "friend-add";
-                button.textContent = "Add";
-                button.addEventListener("click", function () {
-                    const friends = getSavedFriends();
-                    friends.push({ name: name });
-                    localStorage.setItem("sproutbuddy-friends", JSON.stringify(friends));
-                    renderFriends();
-                    renderFriendMatches();
-                });
-                row.append(strong, button);
+            const users = await response.json();
+            if (requestId !== searchRequest) return;
+            if (!response.ok) {
+                throw new Error(users.error || "Unable to search users.");
             }
 
-            friendMatches.append(row);
-        });
+            friendSearchStatus.textContent = users.length
+                ? users.length + " users found"
+                : "No users found.";
+
+            users.forEach(function (user) {
+                const row = document.createElement("div");
+                row.className = "friend-match";
+                row.dataset.userId = user.id;
+
+                const username = document.createElement("strong");
+                username.textContent = user.username;
+
+                const addButton = document.createElement("button");
+                addButton.type = "button";
+                addButton.className = "friend-add";
+                addButton.textContent = "Add";
+                addButton.addEventListener("click", async function () {
+                    addButton.disabled = true;
+                    try {
+                        const addResponse = await fetch(friendsUrl, {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/x-www-form-urlencoded",
+                                Accept: "application/json"
+                            },
+                            body: new URLSearchParams({
+                                userId: String(user.id),
+                                csrfToken: csrfToken
+                            })
+                        });
+                        const added = await addResponse.json();
+                        if (!addResponse.ok) {
+                            throw new Error(added.error || "Unable to connect user.");
+                        }
+
+                        addFriendToList(added);
+                        addButton.replaceWith(document.createTextNode("Added"));
+                    } catch (error) {
+                        showFriendError(error.message);
+                        addButton.disabled = false;
+                    }
+                });
+
+                row.append(username, addButton);
+                friendMatches.append(row);
+            });
+        } catch (error) {
+            if (requestId === searchRequest) {
+                showFriendError(error.message);
+            }
+        }
     }
 
     if (friendSearch) {
         friendSearch.addEventListener("input", renderFriendMatches);
     }
-
-    renderFriends();
 
     // =====================================
     // Garden carousel

@@ -108,6 +108,15 @@
 	    <servlet-name>AccountServlet</servlet-name>
 	    <url-pattern>/account</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+	    <servlet-name>FriendsServlet</servlet-name>
+	    <servlet-class>sproutbuddy.servlet.FriendsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>FriendsServlet</servlet-name>
+	    <url-pattern>/friends</url-pattern>
+	</servlet-mapping>
 		
 	
 	    

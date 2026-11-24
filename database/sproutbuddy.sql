@@ -33,6 +33,20 @@ CREATE TABLE users (
     email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL
 ) ENGINE=InnoDB;
+
+CREATE TABLE friend_connections (
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, friend_id),
+    CONSTRAINT chk_friend_connection_order CHECK (user_id < friend_id),
+    FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE,
+    FOREIGN KEY (friend_id)
+        REFERENCES users(user_id)
+        ON DELETE CASCADE
+) ENGINE=InnoDB;
  
  
 -- =====================================================

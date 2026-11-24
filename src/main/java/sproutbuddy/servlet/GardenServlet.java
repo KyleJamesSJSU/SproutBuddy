@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import sproutbuddy.dao.UserDAO;
+import sproutbuddy.dao.FriendDAO;
 import sproutbuddy.dao.UserPlantDAO;
 import sproutbuddy.model.User;
 import sproutbuddy.model.UserPlant;
@@ -23,11 +24,13 @@ public class GardenServlet extends HttpServlet {
 
     private UserPlantDAO userPlantDAO;
     private UserDAO userDAO;
+    private FriendDAO friendDAO;
 
     @Override
     public void init() {
         userPlantDAO = new UserPlantDAO();
         userDAO = new UserDAO();
+        friendDAO = new FriendDAO();
     }
 
     // =====================================
@@ -81,6 +84,7 @@ public class GardenServlet extends HttpServlet {
             // Retrieve plants belonging to this user
             List<UserPlant> plants =
                     userPlantDAO.getPlantsByUserId(user.getId());
+            request.setAttribute("friends", friendDAO.getFriends(user.getId()));
 
 
 	         // Retrieve the authenticated user's account details.
